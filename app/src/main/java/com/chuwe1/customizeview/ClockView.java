@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
@@ -16,6 +17,9 @@ import java.util.Calendar;
 
 /**
  * 自定义时钟View
+ *
+ * @author Chuwe1
+ * @see <a href="https://github.com/chuwe1/ClockView">ClockView@github</a>
  */
 public class ClockView extends SurfaceView implements SurfaceHolder.Callback, Runnable {
 
@@ -25,9 +29,6 @@ public class ClockView extends SurfaceView implements SurfaceHolder.Callback, Ru
     private SurfaceHolder mHolder;
     private Canvas mCanvas;
     private boolean flag;
-
-    // 指针坐标{x1,y1,x2,y2,x3,y3}
-    private int[] pointerCoordinates = new int[6];
 
     private OnTimeChangeListener onTimeChangeListener;
 
@@ -54,6 +55,13 @@ public class ClockView extends SurfaceView implements SurfaceHolder.Callback, Ru
     private int mHourDegreeLength;
     // 秒刻度
     private int mSecondDegreeLength;
+
+    // 指针坐标{x1,y1,x2,y2,x3,y3}
+    private int[] pointerCoordinates = new int[6];
+    // 数字刻度的区域
+    private Rect numberRect = new Rect();
+    // 用于绘制指针
+    private Path pointerPath = new Path();
 
     // 时钟显示的时、分、秒
     private int mHour, mMinute, mSecond;
@@ -223,48 +231,54 @@ public class ClockView extends SurfaceView implements SurfaceHolder.Callback, Ru
                 //绘制数字
                 mPointerPaint.setColor(Color.BLACK);
                 for (int i = 0; i < 12; i++) {
-                    int number = 6 + i < 12 ? 6 + i : 6 + i > 12 ? i - 6 : 12;
-                    mCanvas.drawText(String.valueOf(number), 0, mRadius * 5.5f / 7, mPointerPaint);
-                    mCanvas.rotate(30);
+                    String number = 6 + i < 12 ? String.valueOf(6 + i)
+                            : 6 + i > 12 ? String.valueOf(i - 6)
+                            : "12";
+                    mPointerPaint.getTextBounds(number, 0, number.length(), numberRect);
+                    float radius = mRadius * 5.25f / 7;
+                    double numberRadians = Math.PI / 180 * (90 + i * 30);
+                    mCanvas.drawText(number, 0, number.length(),
+                            (float) (radius * Math.cos(numberRadians)), // 对齐方式是Center
+                            (float) (radius * Math.sin(numberRadians) + numberRect.height() / 2),
+                            mPointerPaint);
                 }
                 //绘制上下午
                 mCanvas.drawText(mHour < 12 ? "AM" : "PM", 0, mRadius * 1.5f / 4, mPointerPaint);
                 //绘制时针
-                Path path = new Path();
-                path.moveTo(0, 0);
+                pointerPath.moveTo(0, 0);
                 refreshPointerCoordinates(mHourPointerLength);
-                path.lineTo(pointerCoordinates[0], pointerCoordinates[1]);
-                path.lineTo(pointerCoordinates[2], pointerCoordinates[3]);
-                path.lineTo(pointerCoordinates[4], pointerCoordinates[5]);
-                path.close();
+                pointerPath.lineTo(pointerCoordinates[0], pointerCoordinates[1]);
+                pointerPath.lineTo(pointerCoordinates[2], pointerCoordinates[3]);
+                pointerPath.lineTo(pointerCoordinates[4], pointerCoordinates[5]);
+                pointerPath.close();
                 mCanvas.save();
                 mCanvas.rotate(180 + mHour % 12 * 30 + mMinute * 1.0f / 60 * 30);
-                mCanvas.drawPath(path, mPointerPaint);
+                mCanvas.drawPath(pointerPath, mPointerPaint);
                 mCanvas.restore();
                 //绘制分针
-                path.reset();
-                path.moveTo(0, 0);
+                pointerPath.reset();
+                pointerPath.moveTo(0, 0);
                 refreshPointerCoordinates(mMinutePointerLength);
-                path.lineTo(pointerCoordinates[0], pointerCoordinates[1]);
-                path.lineTo(pointerCoordinates[2], pointerCoordinates[3]);
-                path.lineTo(pointerCoordinates[4], pointerCoordinates[5]);
-                path.close();
+                pointerPath.lineTo(pointerCoordinates[0], pointerCoordinates[1]);
+                pointerPath.lineTo(pointerCoordinates[2], pointerCoordinates[3]);
+                pointerPath.lineTo(pointerCoordinates[4], pointerCoordinates[5]);
+                pointerPath.close();
                 mCanvas.save();
                 mCanvas.rotate(180 + mMinute * 6);
-                mCanvas.drawPath(path, mPointerPaint);
+                mCanvas.drawPath(pointerPath, mPointerPaint);
                 mCanvas.restore();
                 //绘制秒针
                 mPointerPaint.setColor(Color.RED);
-                path.reset();
-                path.moveTo(0, 0);
+                pointerPath.reset();
+                pointerPath.moveTo(0, 0);
                 refreshPointerCoordinates(mSecondPointerLength);
-                path.lineTo(pointerCoordinates[0], pointerCoordinates[1]);
-                path.lineTo(pointerCoordinates[2], pointerCoordinates[3]);
-                path.lineTo(pointerCoordinates[4], pointerCoordinates[5]);
-                path.close();
+                pointerPath.lineTo(pointerCoordinates[0], pointerCoordinates[1]);
+                pointerPath.lineTo(pointerCoordinates[2], pointerCoordinates[3]);
+                pointerPath.lineTo(pointerCoordinates[4], pointerCoordinates[5]);
+                pointerPath.close();
                 mCanvas.save();
                 mCanvas.rotate(180 + mSecond * 6);
-                mCanvas.drawPath(path, mPointerPaint);
+                mCanvas.drawPath(pointerPath, mPointerPaint);
                 mCanvas.restore();
             }
         } catch (Exception e) {
