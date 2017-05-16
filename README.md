@@ -3,7 +3,8 @@ Android ClockView
 
 ### **1.废话不多说先上图**
 
-![](https://github.com/chuwe1/ClockView/blob/master/screenshots/clock.gif)
+![](https://github.com/chuwe1/ClockView/blob/master/screenshots/clock1.gif)
+![](https://github.com/chuwe1/ClockView/blob/master/screenshots/clock2.gif)
 
 录制的可能略卡，三次时间图片是因为我分别点了下面三个按钮的效果，并非bug
 
