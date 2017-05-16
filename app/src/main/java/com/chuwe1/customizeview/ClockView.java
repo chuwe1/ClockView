@@ -245,6 +245,7 @@ public class ClockView extends SurfaceView implements SurfaceHolder.Callback, Ru
                 //绘制上下午
                 mCanvas.drawText(mHour < 12 ? "AM" : "PM", 0, mRadius * 1.5f / 4, mPointerPaint);
                 //绘制时针
+                pointerPath.reset();
                 pointerPath.moveTo(0, 0);
                 refreshPointerCoordinates(mHourPointerLength);
                 pointerPath.lineTo(pointerCoordinates[0], pointerCoordinates[1]);
