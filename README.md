@@ -2,8 +2,9 @@
 Android ClockView
 
 ### **1.废话不多说先上图**
-![](http://upload-images.jianshu.io/upload_images/2144156-e91c62262c75ceb0?imageMogr2/auto-orient/strip)
-<br>
+
+![](https://github.com/chuwe1/ClockView/blob/master/screenshots/clock.gif)
+
 录制的可能略卡，三次时间图片是因为我分别点了下面三个按钮的效果，并非bug
 
 --------------------------------
